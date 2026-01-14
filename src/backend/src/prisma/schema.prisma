@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  imageUrls   String[]
+  skills      String[]
+  githubUrl   String
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  creatorId   String    @map("creatorId")
+  creator     User      @relation(name: "creator", fields: [creatorId], references: [id])
+  deletorId   String?   @map("deletorId")
+  deletor     User?     @relation(name: "deletor", fields: [deletorId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  GUEST
+}
+
+model User {
+  id                 String       @id @default(uuid())
+  username           String
+  email              String
+  role               Role
+  title              String
+  bio                String
+  imageUrl           String
+  githubUrl          String
+  linkedInUrl        String
+  createdProjects    Project[]    @relation(name: "creator")
+  deletedProjects    Project[]    @relation(name: "deletor")
+  createdExperiences Experience[] @relation(name: "creator")
+  deletedExperiences Experience[] @relation(name: "deletor")
+}
+
+model Experience {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  companyName String
+  location    String
+  imageUrls   String[]
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  creatorId   String    @map("creatorId")
+  creator     User      @relation(name: "creator", fields: [creatorId], references: [id])
+  deletorId   String?   @map("deletorId")
+  deletor     User?     @relation(name: "deletor", fields: [deletorId], references: [id])
+}
